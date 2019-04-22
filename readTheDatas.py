@@ -12,7 +12,7 @@ timediff = []
 velocity = []
 velocity.insert(0, 0)
 
-with open('April 15 Trial 2.csv', 'r') as csv_file:
+with open('/media/gcs-14/D606-E03A/DATALOG.CSV', 'r') as csv_file:
     csv_reader = csv.reader(csv_file)
 
     for line in csv_reader:
