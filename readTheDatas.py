@@ -1,8 +1,9 @@
 import csv
+#note: need openpyxl module. Use sudo pip3 install openpyxl to install
+import openpyxl
+import datetime
+from openpyxl import Workbook
 
-#readFile = open('yourmom.txt')
-
-# numLines = readFile.readlines()
 
 xAccelRaw = []
 xAccelCal = []
@@ -37,3 +38,51 @@ for x in range(1, len(xAccelCal)):
 for x in range(len(xAccelCal)):
     print(str(timediff[x]) + '\t' + str(velocity[x]))
 csv_file.close()
+
+book = openpyxl.load_workbook('my.xlsx')
+
+SummarySheet = book.get_sheet_by_name('Summary')
+
+date = str(datetime.date.today())
+
+TrialSheet = book.create_sheet(date + "_0")
+
+summaryVelocities = []
+
+summaryVelocities.append(SummarySheet.cell(row=4, column=2).value)
+summaryVelocities.append(SummarySheet.cell(row=5, column=2).value)
+summaryVelocities.append(SummarySheet.cell(row=6, column=2).value)
+summaryVelocities.append(SummarySheet.cell(row=7, column=2).value)
+summaryVelocities.append(SummarySheet.cell(row=8, column=2).value)
+
+maxTrialVelocity = max(velocity)
+
+bump = True
+
+for x in range(len(summaryVelocities)):
+    if summaryVelocities[x]==0:
+        summaryVelocities.insert(x, maxTrialVelocity)
+        SummarySheet.cell(row=x+4, column = 2).value = maxTrialVelocity
+        bump = False
+        break
+
+if bump==True:
+    del summaryVelocities[0]
+    summaryVelocities.append(maxTrialVelocity)
+    SummarySheet.cell(row=4, column=2).value = summaryVelocities[0]
+    SummarySheet.cell(row=5, column=2).value = summaryVelocities[1]
+    SummarySheet.cell(row=6, column=2).value = summaryVelocities[2]
+    SummarySheet.cell(row=7, column=2).value = summaryVelocities[3]
+    SummarySheet.cell(row=8, column=2).value = summaryVelocities[4]
+
+TrialSheet.cell(row=1, column=1).value = "Time (s)"
+TrialSheet.cell(row=1, column=2).value = "XAccelRaw"
+TrialSheet.cell(row=1, column=3).value = "xAccelCal (m/s^2)"
+TrialSheet.cell(row=1, column=4).value = "Velocity (m/s)"
+TrialSheet.cell(row=1, column=6).value = "Max Velocity (m/s):"
+TrialSheet.cell(row=1, column=7).value = maxTrialVelocity
+
+for row in zip(timediff, xAccelRaw, xAccelCal, velocity):
+    TrialSheet.append(row)
+
+book.save('my.xlsx')
